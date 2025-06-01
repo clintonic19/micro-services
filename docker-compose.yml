@@ -1,0 +1,84 @@
+
+#specify the version of the Docker Compose file format
+version: '3.8'
+
+# Define the services that will be run in the Docker containers
+services:
+api-gateway:
+build: ./api-gateway # Build the API Gateway service from the specified directory
+ports: 
+ - "3000:3000" # Map port 3000 of the host to port 3000 of the container
+env_file: ./api-gateway/.env # Load environment variables from the .env file in the api-gateway directory
+depends_on: # Specify dependencies for the service
+  - redis
+  - rabbitmq
+environment: # Set environment variables for the service
+  -REDIS_URL = redis://redis:6379
+  -RABBITMQ_URL = amqp://rabbitmq:5672
+
+# user-services:
+user-services:
+  build: ./user-services
+  env_file: ./user-services/.env
+  depends_on:
+    - redis
+    - rabbitmq
+  environment:
+    -REDIS_URL = redis://redis:6379
+    -RABBITMQ_URL = amqp://rabbitmq:5672
+
+# post service:
+post-service:
+  build: ./post-service
+  env_file: ./post-service/.env
+  depends_on:
+    - redis
+    - rabbitmq
+  environment:
+    -REDIS_URL = redis://redis:6379
+    -RABBITMQ_URL = amqp://rabbitmq:5672
+
+# search-service:
+search-service:
+  build: ./search-service
+  env_file: ./search-service/.env
+  depends_on:
+    - redis
+    - rabbitmq
+  environment:
+    -REDIS_URL = redis://redis:6379
+    -RABBITMQ_URL = amqp://rabbitmq:5672
+
+# media-service:
+media-service:
+  build: ./media-service
+  env_file: ./media-service/.env
+  depends_on:
+    - redis
+    - rabbitmq
+  environment:
+    -REDIS_URL = redis://redis:6379
+    -RABBITMQ_URL = amqp://rabbitmq:5672
+
+# Define the Redis and RabbitMQ services
+redis:
+  image: redis:alpine # Use the latest Redis image from Docker Hub
+  ports:
+    - "6379:6379" # Map port 6379 of the host to port 6379 of the container
+
+# RabbitMQ services 
+rabbitmq:
+  image: rabbitmq:3-management # Use the RabbitMQ image with management plugin
+  ports:
+    - "5672:5672" # Map RabbitMQ port
+    - "15672:15672" # Map RabbitMQ management UI port
+  
+  heathcheck: # Define a health check for the RabbitMQ service
+    test: ["CMD", "rabbitmq-diagnostics", "-q", "ping" ] # Command to check RabbitMQ status
+    interval: 30s # Check every 30 seconds
+    timeout: 10s # Timeout after 10 seconds
+    retries: 5 # Retry up to 5 times if the check fails
+
+  environment:
+    RABBITMQ_DEFAULT_USER: user # Set default username
+    RABBITMQ_DEFAULT_PASS: password # Set default password
