@@ -5,16 +5,16 @@ version: '3.8'
 # Define the services that will be run in the Docker containers
 services:
 api-gateway:
-build: ./api-gateway # Build the API Gateway service from the specified directory
-ports: 
- - "3000:3000" # Map port 3000 of the host to port 3000 of the container
-env_file: ./api-gateway/.env # Load environment variables from the .env file in the api-gateway directory
-depends_on: # Specify dependencies for the service
-  - redis
-  - rabbitmq
-environment: # Set environment variables for the service
-  -REDIS_URL = redis://redis:6379
-  -RABBITMQ_URL = amqp://rabbitmq:5672
+  build: ./api-gateway # Build the API Gateway service from the specified directory
+  ports: 
+    - "3000:3000" # Map port 3000 of the host to port 3000 of the container
+  env_file: ./api-gateway/.env # Load environment variables from the .env file in the api-gateway directory
+  depends_on: # Specify dependencies for the service
+    - redis
+    - rabbitmq
+  environment: # Set environment variables for the service
+    -REDIS_URL = redis://redis:6379
+    -RABBITMQ_URL = amqp://rabbitmq:5672
 
 # user-services:
 user-services:
